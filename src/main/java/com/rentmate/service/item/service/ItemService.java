@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemService {
-    Item createItem(Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl);
-    Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl);
+    Item createItem(Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress);
+    Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress);
     void softDelete(Long id, Long ownerId, Boolean isActive);
     Boolean isItemAvailable(Long id);
     Item updateAvailability(Long id, Long ownerId, Boolean availability);

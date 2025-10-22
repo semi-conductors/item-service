@@ -12,4 +12,5 @@ public class ItemResponseDTO {
     private Long categoryId;
     private String imageUrl;
     private boolean availability;
+    private String ownerAddress;
 }

@@ -35,4 +35,7 @@ public class Item {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+
+    @Column(name = "owner_address", length = 1000, nullable = false)
+    private String ownerAddress;
 }

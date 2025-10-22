@@ -34,7 +34,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item createItem(Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl) {
+    public Item createItem(Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow( () -> new CategoryNotFoundException(categoryId));
 
@@ -45,6 +45,7 @@ public class ItemServiceImpl implements ItemService {
         item.setDescription(description);
         item.setPrice(price);
         item.setImageUrl(imageUrl);
+        item.setOwnerAddress(onwerAddress);
         item.setAvailability(true);
         item.setIsActive(true);
 
@@ -53,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl) {
+    public Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(id));
 
@@ -71,6 +72,7 @@ public class ItemServiceImpl implements ItemService {
         itemRequestDTO.setPrice(price);
         itemRequestDTO.setCategoryId(categoryId);
         itemRequestDTO.setImageUrl(imageUrl);
+        itemRequestDTO.setOwnerAddress(onwerAddress);
 
         itemMapper.updateItemFromDTO(itemRequestDTO, item);
         item.setCategory(category);

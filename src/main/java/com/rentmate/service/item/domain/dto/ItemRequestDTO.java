@@ -11,4 +11,5 @@ public class ItemRequestDTO {
     private Double price;
     private Long categoryId;
     private String imageUrl;
+    private String ownerAddress;
 }

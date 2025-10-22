@@ -33,7 +33,8 @@ public class ItemController {
                 itemRequestDTO.getDescription(),
                 itemRequestDTO.getPrice(),
                 itemRequestDTO.getCategoryId(),
-                itemRequestDTO.getImageUrl()
+                itemRequestDTO.getImageUrl(),
+                itemRequestDTO.getOwnerAddress()
         );
         return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
     }
@@ -65,7 +66,8 @@ public class ItemController {
                 itemRequestDTO.getDescription(),
                 itemRequestDTO.getPrice(),
                 itemRequestDTO.getCategoryId(),
-                itemRequestDTO.getImageUrl()
+                itemRequestDTO.getImageUrl(),
+                itemRequestDTO.getOwnerAddress()
         );
         return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
     }
