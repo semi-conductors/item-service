@@ -10,6 +10,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
 
+    @Mapping(source = "price", target = "rentalPrice")
     @Mapping(source = "category.id", target = "categoryId")
     ItemResponseDTO itemToItemResponseDTO(Item item);
 
@@ -23,6 +24,7 @@ public interface ItemMapper {
     @Mapping(target = "category", ignore = true)
     void updateItemFromDTO(ItemRequestDTO itemRequestDTO, @MappingTarget Item item);
 
+    @Mapping(source = "price", target = "rentalPrice")
     @Mapping(source = "category.id", target = "categoryId")
     ItemResponseDTO updateAvailabilityToDTO(Item item);
 }

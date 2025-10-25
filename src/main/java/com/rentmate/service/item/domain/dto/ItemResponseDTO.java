@@ -6,9 +6,10 @@ import lombok.Data;
 public class ItemResponseDTO {
 
     private Long id;
+    private Long ownerId;
     private String title;
     private String description;
-    private Double price;
+    private Double rentalPrice;
     private Long categoryId;
     private String imageUrl;
     private boolean availability;
