@@ -9,6 +9,7 @@ import com.rentmate.service.item.repository.CategoryRepository;
 import com.rentmate.service.item.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryMapper = categoryMapper;
     }
 
-    @Override
+    @Override @Transactional
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
         if (categoryRepository.existsByName(categoryDTO.getName())) {
             throw new CategoryAlreadyExistsException(categoryDTO.getName());

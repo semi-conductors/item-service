@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface UserClient {
 //    @GetMapping("/{id}")
 //    UserResponseDTO getUserById(@PathVariable("id") Long id);
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/details")
     UserResponseDTO getUserById(
             @PathVariable("id") Long id,
             @RequestHeader("Authorization") String token
