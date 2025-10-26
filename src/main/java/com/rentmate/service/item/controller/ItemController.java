@@ -26,8 +26,9 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<ItemResponseDTO> createItem(@RequestBody ItemRequestDTO itemRequestDTO){
+    public ResponseEntity<ItemResponseDTO> createItem(@RequestBody ItemRequestDTO itemRequestDTO, @RequestHeader("Authorization") String token){
         Item item = itemService.createItem(
+                token,
                 itemRequestDTO.getOwnerId(),
                 itemRequestDTO.getTitle(),
                 itemRequestDTO.getDescription(),
@@ -50,9 +51,8 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemResponseDTO> getItemById(@PathVariable Long id) {
-        Item item = itemService.getItemById(id)
-                .orElseThrow(() -> new ItemNotFoundException(id));
-        return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
+        ItemResponseDTO item = itemService.getItemById(id);
+        return ResponseEntity.ok(item);
     }
 
     @PutMapping("/{id}")

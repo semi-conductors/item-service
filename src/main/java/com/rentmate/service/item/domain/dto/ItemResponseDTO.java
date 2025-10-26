@@ -14,4 +14,8 @@ public class ItemResponseDTO {
     private String imageUrl;
     private boolean availability;
     private String ownerAddress;
+    ////////////////////////
+//    private String ownerName;
+//    private Double rating;
+//    private Integer totalRatings;
 }

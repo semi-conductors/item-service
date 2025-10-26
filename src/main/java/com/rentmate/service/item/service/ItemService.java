@@ -10,13 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemService {
-    Item createItem(Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress);
+    Item createItem(String token, Long ownerId,String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress);
     Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress);
     void softDelete(Long id, Long ownerId, Boolean isActive);
     Boolean isItemAvailable(Long id);
     Item updateAvailability(Long id, Long ownerId, Boolean availability);
     List<Item> getItemsByOwner(Long ownerId);
-    Optional<Item> getItemById(Long id);
+    //Optional<Item> getItemById(Long id);
+    ItemResponseDTO getItemById(Long id);
     Page<ItemResponseDTO> searchItems(Long categoryId, Double minPrice, Double maxPrice, String keyword, Pageable pageable);
     List<Category> getAllCategories();
 }

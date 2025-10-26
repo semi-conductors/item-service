@@ -1,7 +1,9 @@
 package com.rentmate.service.item.service.impl;
 
+import com.rentmate.service.item.client.UserClient;
 import com.rentmate.service.item.domain.dto.ItemRequestDTO;
 import com.rentmate.service.item.domain.dto.ItemResponseDTO;
+import com.rentmate.service.item.domain.dto.UserResponseDTO;
 import com.rentmate.service.item.domain.entity.Category;
 import com.rentmate.service.item.domain.entity.Item;
 import com.rentmate.service.item.domain.mapper.ItemMapper;
@@ -25,16 +27,24 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final CategoryRepository categoryRepository;
     private final ItemMapper itemMapper;
+    private final UserClient userClient;
 
     @Autowired
-    public ItemServiceImpl(ItemRepository itemRepository, CategoryRepository categoryRepository, ItemMapper itemMapper) {
+    public ItemServiceImpl(ItemRepository itemRepository, CategoryRepository categoryRepository, ItemMapper itemMapper, UserClient userClient) {
         this.itemRepository = itemRepository;
         this.categoryRepository = categoryRepository;
         this.itemMapper = itemMapper;
+        this.userClient = userClient;
     }
 
     @Override
-    public Item createItem(Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress) {
+    public Item createItem(String token, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String ownerAddress) {
+
+        UserResponseDTO user = userClient.getUserById(ownerId, token);
+        if (user == null) {
+            throw new RuntimeException("User not found with id: " + ownerId);
+        }
+
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow( () -> new CategoryNotFoundException(categoryId));
 
@@ -45,7 +55,7 @@ public class ItemServiceImpl implements ItemService {
         item.setDescription(description);
         item.setPrice(price);
         item.setImageUrl(imageUrl);
-        item.setOwnerAddress(onwerAddress);
+        item.setOwnerAddress(ownerAddress);
         item.setAvailability(true);
         item.setIsActive(true);
 
@@ -54,7 +64,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     @Override
-    public Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String onwerAddress) {
+    public Item updateItem(Long id, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String ownerAddress) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(id));
 
@@ -72,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
         itemRequestDTO.setPrice(price);
         itemRequestDTO.setCategoryId(categoryId);
         itemRequestDTO.setImageUrl(imageUrl);
-        itemRequestDTO.setOwnerAddress(onwerAddress);
+        itemRequestDTO.setOwnerAddress(ownerAddress);
 
         itemMapper.updateItemFromDTO(itemRequestDTO, item);
         item.setCategory(category);
@@ -119,9 +129,22 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByOwnerIdAndIsActiveTrue(ownerId);
     }
 
+//    @Override
+//    public Optional<Item> getItemById(Long id) {
+//        return itemRepository.findById(id);
+//    }
     @Override
-    public Optional<Item> getItemById(Long id) {
-        return itemRepository.findById(id);
+    public ItemResponseDTO getItemById(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new ItemNotFoundException(id));
+        ItemResponseDTO dto = itemMapper.itemToItemResponseDTO(item);
+//        UserResponseDTO owner = userClient.getUserById(item.getOwnerId());
+//        if (owner != null) {
+//            dto.setOwnerName(owner.getUserName());
+//            dto.setRating(owner.getRating());
+//            dto.setTotalRatings(owner.getTotalRatings());
+//        }
+        return dto;
     }
 
     @Override
