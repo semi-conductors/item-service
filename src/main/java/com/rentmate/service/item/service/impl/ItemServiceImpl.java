@@ -40,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Item createItem(String token, Long ownerId, String title, String description, Double price, Long categoryId, String imageUrl, String ownerAddress) {
 
-        UserResponseDTO user = userClient.getUserById(ownerId, "Bearer " + token);
+        UserResponseDTO user = userClient.getUserById(ownerId, token);
         if (user == null) {
             throw new RuntimeException("User not found with id: " + ownerId);
         }
