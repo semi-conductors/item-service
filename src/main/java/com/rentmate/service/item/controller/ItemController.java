@@ -1,5 +1,6 @@
 package com.rentmate.service.item.controller;
 
+import com.cloudinary.Cloudinary;
 import com.rentmate.service.item.domain.dto.ItemRequestDTO;
 import com.rentmate.service.item.domain.dto.ItemResponseDTO;
 import com.rentmate.service.item.domain.entity.Category;
@@ -11,34 +12,78 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/items")
 public class ItemController {
     private final ItemService itemService;
     private final ItemMapper itemMapper;
+    private Cloudinary cloudinary;
 
-    public ItemController(ItemService itemService, ItemMapper itemMapper) {
+    public ItemController(ItemService itemService, ItemMapper itemMapper, Cloudinary cloudinary) {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
+        this.cloudinary = cloudinary;
     }
 
+//    @PostMapping
+//    public ResponseEntity<ItemResponseDTO> createItem(
+//            @RequestPart("imageFile") MultipartFile imageFile,
+////            @RequestBody ItemRequestDTO itemRequestDTO,
+//            @RequestPart("itemData") ItemRequestDTO itemRequestDTO,
+//            @RequestHeader("Authorization") String token){
+//
+//        String tempImageUrl = "/images/" + imageFile.getOriginalFilename();
+//        itemRequestDTO.setImageUrl(tempImageUrl);
+//
+//        Item item = itemService.createItem(
+//                token,
+//                itemRequestDTO.getOwnerId(),
+//                itemRequestDTO.getTitle(),
+//                itemRequestDTO.getDescription(),
+//                itemRequestDTO.getPrice(),
+//                itemRequestDTO.getCategoryId(),
+//                itemRequestDTO.getImageUrl(),
+//                itemRequestDTO.getOwnerAddress()
+//        );
+//        return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
+//    }
     @PostMapping
-    public ResponseEntity<ItemResponseDTO> createItem(@RequestBody ItemRequestDTO itemRequestDTO, @RequestHeader("Authorization") String token){
-        Item item = itemService.createItem(
-                token,
-                itemRequestDTO.getOwnerId(),
-                itemRequestDTO.getTitle(),
-                itemRequestDTO.getDescription(),
-                itemRequestDTO.getPrice(),
-                itemRequestDTO.getCategoryId(),
-                itemRequestDTO.getImageUrl(),
-                itemRequestDTO.getOwnerAddress()
-        );
-        return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
+    public ResponseEntity<ItemResponseDTO> createItem(
+            @RequestPart("imageFile") MultipartFile imageFile,
+            @RequestPart("itemData") ItemRequestDTO itemRequestDTO,
+            @RequestHeader("Authorization") String token) {
+
+        try {
+            Map<String, Object> uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), Map.of());
+
+            String uploadedImageUrl = (String) uploadResult.get("secure_url");
+            itemRequestDTO.setImageUrl(uploadedImageUrl);
+
+            Item item = itemService.createItem(
+                    token,
+                    itemRequestDTO.getOwnerId(),
+                    itemRequestDTO.getTitle(),
+                    itemRequestDTO.getDescription(),
+                    itemRequestDTO.getPrice(),
+                    itemRequestDTO.getCategoryId(),
+                    itemRequestDTO.getImageUrl(),
+                    itemRequestDTO.getOwnerAddress()
+            );
+
+            return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
+
 
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<ItemResponseDTO>> getItemsByOwner(@PathVariable Long ownerId) {
