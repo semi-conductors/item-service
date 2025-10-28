@@ -17,7 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
+//@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/items")
 public class ItemController {
@@ -31,28 +32,6 @@ public class ItemController {
         this.cloudinary = cloudinary;
     }
 
-//    @PostMapping
-//    public ResponseEntity<ItemResponseDTO> createItem(
-//            @RequestPart("imageFile") MultipartFile imageFile,
-////            @RequestBody ItemRequestDTO itemRequestDTO,
-//            @RequestPart("itemData") ItemRequestDTO itemRequestDTO,
-//            @RequestHeader("Authorization") String token){
-//
-//        String tempImageUrl = "/images/" + imageFile.getOriginalFilename();
-//        itemRequestDTO.setImageUrl(tempImageUrl);
-//
-//        Item item = itemService.createItem(
-//                token,
-//                itemRequestDTO.getOwnerId(),
-//                itemRequestDTO.getTitle(),
-//                itemRequestDTO.getDescription(),
-//                itemRequestDTO.getPrice(),
-//                itemRequestDTO.getCategoryId(),
-//                itemRequestDTO.getImageUrl(),
-//                itemRequestDTO.getOwnerAddress()
-//        );
-//        return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
-//    }
     @PostMapping
     public ResponseEntity<ItemResponseDTO> createItem(
             @RequestPart("imageFile") MultipartFile imageFile,
@@ -116,6 +95,48 @@ public class ItemController {
         );
         return ResponseEntity.ok(itemMapper.itemToItemResponseDTO(item));
     }
+
+    @PutMapping("/{id}/with-image")
+    public ResponseEntity<ItemResponseDTO> updateItemWithImage(
+            @PathVariable Long id,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile,
+            @RequestPart("itemData") ItemRequestDTO itemRequestDTO) {
+
+        try {
+            // Check if a new image file was provided
+            if (imageFile != null && !imageFile.isEmpty()) {
+                // Upload new image to Cloudinary
+                Map<String, Object> uploadResult = cloudinary.uploader().upload(
+                        imageFile.getBytes(),
+                        Map.of()
+                );
+
+                // Get the new URL
+                String uploadedImageUrl = (String) uploadResult.get("secure_url");
+                itemRequestDTO.setImageUrl(uploadedImageUrl);
+            }
+
+            // Proceed to update item
+            Item updatedItem = itemService.updateItem(
+                    id,
+                    itemRequestDTO.getOwnerId(),
+                    itemRequestDTO.getTitle(),
+                    itemRequestDTO.getDescription(),
+                    itemRequestDTO.getPrice(),
+                    itemRequestDTO.getCategoryId(),
+                    itemRequestDTO.getImageUrl(),
+                    itemRequestDTO.getOwnerAddress()
+            );
+
+            ItemResponseDTO responseDTO = itemMapper.itemToItemResponseDTO(updatedItem);
+            return ResponseEntity.ok(responseDTO);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> softDelete(@PathVariable Long id, @RequestParam Long ownerId, @RequestParam(required = false) Boolean isActive) {
