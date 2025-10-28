@@ -36,14 +36,31 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
-        Category category = categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id));
-        if (categoryRepository.existsByName(categoryDTO.getName()) || !category.getName().equals(categoryDTO.getName())) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException(id));
+
+        // Only check for duplicates if the name is actually being changed
+        if (!category.getName().equals(categoryDTO.getName()) &&
+                categoryRepository.existsByName(categoryDTO.getName())) {
             throw new CategoryAlreadyExistsException(categoryDTO.getName());
         }
+
         category.setName(categoryDTO.getName());
         category = categoryRepository.save(category);
         return categoryMapper.toDTO(category);
     }
+
+
+//    @Override
+//    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
+//        Category category = categoryRepository.findById(id).orElseThrow(() -> new CategoryNotFoundException(id));
+//        if (categoryRepository.existsByName(categoryDTO.getName()) || !category.getName().equals(categoryDTO.getName())) {
+//            throw new CategoryAlreadyExistsException(categoryDTO.getName());
+//        }
+//        category.setName(categoryDTO.getName());
+//        category = categoryRepository.save(category);
+//        return categoryMapper.toDTO(category);
+//    }
 
     @Override
     public void deleteCategory(Long id) {

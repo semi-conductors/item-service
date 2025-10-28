@@ -92,14 +92,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void softDelete(Long id, Long ownerId, Boolean isActive) {
+//        Item item = itemRepository.findById(id)
+//                .orElseThrow(() -> new ItemNotFoundException(id));
+//
+//        if (!item.getOwnerId().equals(ownerId)) {
+//            throw new OwnerMismatchException();
+//        }
+//        item.setIsActive(isActive);
+//        itemRepository.save(item);
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ItemNotFoundException(id));
 
         if (!item.getOwnerId().equals(ownerId)) {
             throw new OwnerMismatchException();
         }
-        item.setIsActive(isActive);
-        itemRepository.save(item);
+
+        itemRepository.delete(item);
     }
 
     @Override
@@ -153,13 +161,20 @@ public class ItemServiceImpl implements ItemService {
 
         if (categoryId != null && minPrice != null && maxPrice != null) {
             itemsPage = itemRepository.findByCategoryIdAndPriceBetweenAndIsActiveTrue(categoryId, minPrice, maxPrice, pageable);
+
+        } else if (categoryId != null) {
+            itemsPage = itemRepository.findByCategoryIdAndIsActiveTrue(categoryId, pageable);
+
         } else if (minPrice != null && maxPrice != null) {
             itemsPage = itemRepository.findByPriceBetweenAndIsActiveTrue(minPrice, maxPrice, pageable);
+
         } else if (keyword != null && !keyword.isEmpty()) {
             itemsPage = itemRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndIsActiveTrue(keyword, keyword, pageable);
+
         } else {
             itemsPage = itemRepository.findAll(pageable);
         }
+
 
         return itemsPage.map(itemMapper::itemToItemResponseDTO);
     }

@@ -21,4 +21,5 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Page<Item> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndIsActiveTrue(
             String titleKeyword, String descriptionKeyword, Pageable pageable);
 
+    Page<Item> findByCategoryIdAndIsActiveTrue(Long categoryId, Pageable pageable);
 }
